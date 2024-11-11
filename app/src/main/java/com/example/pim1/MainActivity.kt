@@ -332,7 +332,7 @@ fun AddDays(modifier: Modifier = Modifier){
             var days by remember { mutableStateOf("") }
             OutlinedTextField(
                 value = days,
-                onValueChange = { days = it },
+                onValueChange = { if(it.toIntOrNull() != null)days = it else days = ""},
                 label = { Text("Liczba dni") },
                 singleLine = true,
                 modifier = modifier
