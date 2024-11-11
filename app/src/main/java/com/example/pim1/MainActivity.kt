@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -72,12 +73,13 @@ fun Tabs(modifier: Modifier = Modifier){
     val titles = listOf("Różnica dat", "Dodaj lub odejmij dni")
 
     Column (
-        modifier = Modifier.padding(top = 40.dp),
+        modifier = Modifier.padding(top = 40.dp)/*.background(color = Color(0xffffe3eb))*/,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ){
         //Surface(Modifier.height(40.dp)){}
         TabRow(selectedTabIndex = selectedTabIndex,
+            /*containerColor = Color(0xffffe3eb),*/
             contentColor = Color.Black,
             indicator = { tabPositions ->
                 SecondaryIndicator(
@@ -145,7 +147,16 @@ fun DatePickerTextField(text : String, selectedDate: String, onDataChange: (Stri
                 }
             }
     )
-    var showDialog by remember { mutableStateOf(false) }
+    /*var hideDialog by remember { mutableStateOf(false) }
+    if(selectedDate == "08/04/2024" && !hideDialog){
+        AlertDialog(
+            onDismissRequest = { hideDialog = true },
+            title = {Text("")},
+            text = {Text("Kocham Cię Aguniu ❤\uFE0F")},
+            confirmButton = {}
+
+        )
+    }*/
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -182,15 +193,16 @@ fun dateDifferenceOutput(start: String, end: String): String{
                 "${period.years} lat, "
             }
         }
-
-        outputString += if (period.months < 4) {
-            if (period.months == 1) {
-                "${period.months} miesiąc, "
+        if(period.months > 0) {
+            outputString += if (period.months < 4) {
+                if (period.months == 1) {
+                    "${period.months} miesiąc, "
+                } else {
+                    "${period.months} miesiące, "
+                }
             } else {
-                "${period.months} miesiące, "
+                "${period.months} miesięcy, "
             }
-        } else {
-            "${period.months} miesięcy, "
         }
 
         outputString += if (period.days == 1){
@@ -201,23 +213,12 @@ fun dateDifferenceOutput(start: String, end: String): String{
 
         //in other units
 
-        outputString += "\n"
-
         val years = ChronoUnit.YEARS.between(startDate, endDate).toInt()
-        if(years > 0) {
-            outputString += if (years < 4) {
-                if (years == 1) {
-                    "$years rok lub "
-                } else {
-                    "$years lata lub "
-                }
-            } else {
-                "$years lat lub "
-            }
-        }
-
         val months = ChronoUnit.MONTHS.between(startDate, endDate).toInt()
-        if(months > 0) {
+
+        if (months > 0) outputString += "\n"
+
+        if(years > 0) {
             outputString += if (months < 4) {
                 if (months == 1) {
                     "$months miesiąc lub "
@@ -230,10 +231,13 @@ fun dateDifferenceOutput(start: String, end: String): String{
         }
 
         val days = ChronoUnit.DAYS.between(startDate, endDate).toInt()
-        outputString += if (days == 1){
-            "$days dzień"
-        }else{
-            "$days dni"
+        if (months > 0) {
+            outputString +=
+                if (days == 1) {
+                    "$days dzień"
+                } else {
+                    "$days dni"
+                }
         }
 
     }else ""
