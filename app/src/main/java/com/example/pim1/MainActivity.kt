@@ -89,11 +89,11 @@ fun Tabs(modifier: Modifier = Modifier){
 
             }) {
             titles.forEachIndexed{
-                    index, title -> Tab(
-                text = { Text(title)},
-                selected = (index == selectedTabIndex),
-                onClick = {selectedTabIndex = index}
-            )
+                index, title -> Tab(
+                    text = { Text(title)},
+                    selected = (index == selectedTabIndex),
+                    onClick = {selectedTabIndex = index}
+                )
             }
         }
         when(selectedTabIndex){
