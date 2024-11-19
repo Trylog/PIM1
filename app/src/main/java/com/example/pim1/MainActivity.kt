@@ -13,10 +13,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -40,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.pim1.ui.theme.AppTheme
 import java.time.LocalDate
@@ -137,6 +142,7 @@ fun DatePickerTextField(text : String, selectedDate: String, onDataChange: (Stri
         onValueChange = {},
         label = { Text(text) },
         readOnly = true,
+        trailingIcon = { Icon(Icons.Default.DateRange, contentDescription = null)},
         modifier = Modifier
             .padding(top = 10.dp)
             .onFocusChanged { focusState ->
@@ -148,7 +154,7 @@ fun DatePickerTextField(text : String, selectedDate: String, onDataChange: (Stri
             }
     )
     /*var hideDialog by remember { mutableStateOf(false) }
-    if(selectedDate == "08/04/2024" && !hideDialog){
+    if(selectedDate.contains("08/04/") && !hideDialog){
         AlertDialog(
             onDismissRequest = { hideDialog = true },
             title = {Text("")},
@@ -183,7 +189,7 @@ fun dateDifferenceOutput(start: String, end: String): String{
         val endDate = LocalDate.parse(end, dateFormater)
         val period = Period.between(startDate, endDate)
         if(period.years > 0) {
-            outputString += if (period.years < 4) {
+            outputString += if (period.years % 10 < 4 && period.years !in 12..14) {
                 if (period.years == 1) {
                     "${period.years} rok, "
                 } else {
@@ -194,7 +200,7 @@ fun dateDifferenceOutput(start: String, end: String): String{
             }
         }
         if(period.months > 0) {
-            outputString += if (period.months < 4) {
+            outputString += if (period.months % 10 < 4 && period.months !in 12..14) {
                 if (period.months == 1) {
                     "${period.months} miesiąc, "
                 } else {
@@ -257,7 +263,6 @@ fun DateDifference(modifier: Modifier = Modifier){
     ){
         DatePickerTextField("Początek", start, {n -> start = n})
         DatePickerTextField("Koniec", end, {n -> end = n})
-        val dateFormater = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         DateOutput(dateDifferenceOutput(start, end))
     }
 }
@@ -314,28 +319,56 @@ fun AddDays(modifier: Modifier = Modifier){
                 }
             }
             var days by remember { mutableStateOf("") }
+            var months by remember { mutableStateOf("") }
+            var years by remember { mutableStateOf("") }
             OutlinedTextField(
                 value = days,
-                onValueChange = { if(it.toIntOrNull() != null)days = it else days = ""},
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                onValueChange = { days = if(it.toIntOrNull() != null) it else "" },
                 label = { Text("Liczba dni") },
                 singleLine = true,
                 modifier = modifier
 
             )
+            OutlinedTextField(
+                value = months,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                onValueChange = { months = if(it.toIntOrNull() != null) it else "" },
+                label = { Text("Liczba miesięcy") },
+                singleLine = true,
+                modifier = modifier
+
+            )
+            OutlinedTextField(
+                value = years,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                onValueChange = { years = if(it.toIntOrNull() != null) it else "" },
+                label = { Text("Liczba lat") },
+                singleLine = true,
+                modifier = modifier
+
+            )
             val dateFormater = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-            if (pickedText == "Dodaj") {
-                DateOutput(
-                    if (start.isNotBlank() && days.isNotBlank())
-                        LocalDate.parse(start, dateFormater)
-                            .plusDays(days.toLong()).format(dateFormater).toString() else ""
-                )
-            } else {
-                DateOutput(
-                    if (start.isNotBlank() && days.isNotBlank())
-                        LocalDate.parse(start, dateFormater)
-                            .minusDays(days.toLong()).format(dateFormater).toString() else ""
-                )
-            }
+            var finalDate : LocalDate
+            if (start.isNotBlank()) {
+                finalDate = LocalDate.parse(start, dateFormater)
+                if (pickedText == "Dodaj") {
+                    if (days.isNotBlank())
+                        finalDate = finalDate.plusDays(days.toLong())
+                    if (months.isNotBlank())
+                        finalDate = finalDate.plusMonths(months.toLong())
+                    if (years.isNotBlank())
+                        finalDate = finalDate.plusYears(years.toLong())
+                } else {
+                    if (days.isNotBlank())
+                        finalDate = finalDate.minusDays(days.toLong())
+                    if (months.isNotBlank())
+                        finalDate = finalDate.minusMonths(months.toLong())
+                    if (years.isNotBlank())
+                        finalDate = finalDate.minusYears(years.toLong())
+                }
+                DateOutput(finalDate.format(dateFormater).toString())
+            } else DateOutput("")
         }
     }
 }
