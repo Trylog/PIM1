@@ -14,10 +14,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -46,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import com.example.pim1.ui.theme.AppTheme
 import java.time.LocalDate
 import java.time.Period
-import java.time.Year
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
@@ -140,6 +142,7 @@ fun DatePickerTextField(text : String, selectedDate: String, onDataChange: (Stri
         onValueChange = {},
         label = { Text(text) },
         readOnly = true,
+        trailingIcon = { Icon(Icons.Default.DateRange, contentDescription = null)},
         modifier = Modifier
             .padding(top = 10.dp)
             .onFocusChanged { focusState ->
@@ -151,7 +154,7 @@ fun DatePickerTextField(text : String, selectedDate: String, onDataChange: (Stri
             }
     )
     /*var hideDialog by remember { mutableStateOf(false) }
-    if(selectedDate == "08/04/2024" && !hideDialog){
+    if(selectedDate.contains("08/04/") && !hideDialog){
         AlertDialog(
             onDismissRequest = { hideDialog = true },
             title = {Text("")},
